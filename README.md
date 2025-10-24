@@ -65,7 +65,7 @@ Once you have created a project and defined endpoints, mock responses are served
 
 ## Tooling
 
-- **Backend:** Go 1.21, Gin, pgx, JWT, bcrypt.
+- **Backend:** Go 1.24, Gin, pgx, JWT, bcrypt.
 - **Frontend:** Next.js 14 (App Router), React 18, TypeScript.
 
 Feel free to extend the platform with additional features such as shared projects, request logging, or versioned endpoint definitions.
