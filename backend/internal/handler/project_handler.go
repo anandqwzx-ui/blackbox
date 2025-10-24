@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/ctonew/mockapi/internal/dto"
-	"github.com/ctonew/mockapi/internal/requestcontext"
-	"github.com/ctonew/mockapi/internal/service"
+	"github.com/crudbox/crudbox/internal/dto"
+	"github.com/crudbox/crudbox/internal/requestcontext"
+	"github.com/crudbox/crudbox/internal/service"
 )
 
 // ProjectHandler manages project-related HTTP endpoints.

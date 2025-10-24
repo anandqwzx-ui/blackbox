@@ -7,9 +7,9 @@ import (
 	"github.com/jackc/pgerrcode"
 	"github.com/jackc/pgx/v5/pgconn"
 
-	"github.com/ctonew/mockapi/internal/models"
-	"github.com/ctonew/mockapi/internal/repository"
-	"github.com/ctonew/mockapi/internal/utils"
+	"github.com/crudbox/crudbox/internal/models"
+	"github.com/crudbox/crudbox/internal/repository"
+	"github.com/crudbox/crudbox/internal/utils"
 )
 
 // AuthServiceError provides sentinel errors the handler layer can reason about.

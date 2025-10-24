@@ -20,8 +20,8 @@ export default function SignupPage() {
 
     try {
       const response = await signup(email.trim(), password);
-      localStorage.setItem('mockapi_token', response.token);
-      localStorage.setItem('mockapi_email', response.email);
+      localStorage.setItem('crudbox_token', response.token);
+      localStorage.setItem('crudbox_email', response.email);
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to sign up');
@@ -33,7 +33,7 @@ export default function SignupPage() {
   return (
     <section style={{ maxWidth: '420px', margin: '0 auto' }}>
       <h1>Create an account</h1>
-      <p className="lead">Join Mock API Studio to build, test, and share API simulations effortlessly.</p>
+      <p className="lead">Join Crudbox to build, test, and share API simulations effortlessly.</p>
 
       <form onSubmit={handleSubmit} className="card">
         <label htmlFor="email">Email address</label>

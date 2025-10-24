@@ -7,8 +7,8 @@ import (
 
     "github.com/gin-gonic/gin"
 
-    "github.com/ctonew/mockapi/internal/repository"
-    "github.com/ctonew/mockapi/internal/service"
+    "github.com/crudbox/crudbox/internal/repository"
+    "github.com/crudbox/crudbox/internal/service"
 )
 
 // MockHandler resolves incoming requests into stored mock responses.

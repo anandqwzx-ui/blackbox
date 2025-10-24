@@ -1,15 +1,29 @@
 # Environment files
 *.env
+*.env.*
 
 # macOS
 .DS_Store
 
+# Editor directories
+.vscode/
+.idea/
+*.code-workspace
+
 # Go build artifacts
 backend/bin/
 backend/tmp/
+backend/dist/
 backend/coverage.out
+backend/*.log
+coverage/
 
 # Node / Next.js
-frontend/node_modules/
+**/node_modules/
 frontend/.next/
 frontend/out/
+frontend/.turbo/
+frontend/.vercel/
+frontend/.swc/
+frontend/npm-debug.log*
+frontend/yarn-error.log*

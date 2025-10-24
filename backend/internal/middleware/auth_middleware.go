@@ -6,9 +6,9 @@ import (
 
     "github.com/gin-gonic/gin"
 
-    "github.com/ctonew/mockapi/internal/repository"
-    "github.com/ctonew/mockapi/internal/requestcontext"
-    "github.com/ctonew/mockapi/internal/utils"
+    "github.com/crudbox/crudbox/internal/repository"
+    "github.com/crudbox/crudbox/internal/requestcontext"
+    "github.com/crudbox/crudbox/internal/utils"
 )
 
 // AuthMiddleware ensures requests are authenticated using Bearer JWT tokens.

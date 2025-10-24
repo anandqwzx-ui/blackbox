@@ -5,9 +5,9 @@ import (
 
     "github.com/gin-gonic/gin"
 
-    "github.com/ctonew/mockapi/internal/dto"
-    "github.com/ctonew/mockapi/internal/repository"
-    "github.com/ctonew/mockapi/internal/service"
+    "github.com/crudbox/crudbox/internal/dto"
+    "github.com/crudbox/crudbox/internal/repository"
+    "github.com/crudbox/crudbox/internal/service"
 )
 
 // AuthHandler exposes authentication related HTTP endpoints.

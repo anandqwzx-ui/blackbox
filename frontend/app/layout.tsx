@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Mock API Studio',
+  title: 'Crudbox',
   description: 'Create and manage mock APIs for rapid prototyping.',
 };
 

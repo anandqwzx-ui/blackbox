@@ -1,6 +1,6 @@
-# Mock API Studio
+# Crudbox
 
-Mock API Studio is a two-part application for designing and serving mocked HTTP APIs. The backend is a Golang microservice powered by Gin and PostgreSQL, and the frontend is a minimalist black-and-white Next.js dashboard for managing organisations, projects, and endpoints.
+Crudbox is a two-part application for designing and serving mocked HTTP APIs. The backend is a Golang microservice powered by Gin and PostgreSQL, and the frontend is a minimalist black-and-white Next.js dashboard for managing organisations, projects, and endpoints.
 
 ## Project Structure
 
@@ -16,8 +16,9 @@ frontend/  # Next.js application (App Router)
 - Email + password authentication with JWT sessions.
 - Organisation, project, and endpoint management with soft-delete audit fields.
 - Per-project five-character alphanumeric codes for publicly accessible mock endpoints.
-- Raw SQL data access with the standard library (`database/sql`) and the pgx driver.
+- Raw SQL data access powered by `sqlx` on top of the pgx driver (no ORM).
 - Built-in migration runner that executes embedded SQL files on startup.
+- Graceful shutdown and signal handling for safe restarts.
 - IDOR protections: every data interaction checks ownership before proceeding.
 
 ### Getting Started
@@ -32,6 +33,15 @@ frontend/  # Next.js application (App Router)
    cd backend
    go run ./cmd/server
    ```
+
+### Database migrations
+
+SQL migrations live in `backend/internal/database/migrations` and are executed automatically whenever the API starts. If you need to apply them without keeping the server running (for example during CI deploy steps), you can run:
+
+```
+cd backend
+go run ./cmd/server --migrate-only
+```
 
 The server listens on `PORT` (default `8080`). API routes are namespaced under `/api/v1`, while mock endpoints resolve directly from the root using the project code (e.g. `/{code}/path`).
 
@@ -65,7 +75,7 @@ Once you have created a project and defined endpoints, mock responses are served
 
 ## Tooling
 
-- **Backend:** Go 1.24, Gin, pgx, JWT, bcrypt.
+- **Backend:** Go 1.24, Gin, sqlx, pgx, JWT, bcrypt.
 - **Frontend:** Next.js 14 (App Router), React 18, TypeScript.
 
 Feel free to extend the platform with additional features such as shared projects, request logging, or versioned endpoint definitions.

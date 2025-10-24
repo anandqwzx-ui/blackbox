@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <>
       <header className="space-y-4">
-        <h1>Mock API Studio</h1>
+        <h1>Crudbox</h1>
         <p className="lead">
           Spin up realistic API prototypes in minutes. Design endpoints, manage organisations and projects, and instantly respond to incoming requests.
         </p>

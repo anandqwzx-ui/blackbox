@@ -5,7 +5,9 @@ import (
     "database/sql"
     "errors"
 
-    "github.com/ctonew/mockapi/internal/models"
+    "github.com/jmoiron/sqlx"
+
+    "github.com/crudbox/crudbox/internal/models"
 )
 
 // ErrProjectNotFound indicates a project record was not found or is inaccessible for the user.
@@ -17,13 +19,18 @@ type ProjectWithOrganisation struct {
     OrganisationUUID string
 }
 
+type projectWithOrganisationRow struct {
+    models.Project    `db:""`
+    OrganisationUUID string `db:"organisation_uuid"`
+}
+
 // ProjectRepository handles project persistence operations.
 type ProjectRepository struct {
-    db *sql.DB
+    db *sqlx.DB
 }
 
 // NewProjectRepository constructs a ProjectRepository.
-func NewProjectRepository(db *sql.DB) *ProjectRepository {
+func NewProjectRepository(db *sqlx.DB) *ProjectRepository {
     return &ProjectRepository{db: db}
 }
 
@@ -36,9 +43,9 @@ func (r *ProjectRepository) Create(ctx context.Context, organisationID, ownerUse
                   created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
     `
 
-    row := r.db.QueryRowContext(ctx, query, organisationID, ownerUserID, name, description, code, actorID)
+    row := r.db.QueryRowxContext(ctx, query, organisationID, ownerUserID, name, description, code, actorID)
     project := &models.Project{}
-    if err := scanProject(row, project); err != nil {
+    if err := row.StructScan(project); err != nil {
         return nil, err
     }
 
@@ -57,37 +64,20 @@ func (r *ProjectRepository) ListByUser(ctx context.Context, ownerUserID int64) (
         ORDER BY p.created_at DESC
     `
 
-    rows, err := r.db.QueryContext(ctx, query, ownerUserID)
-    if err != nil {
+    var rowsData []projectWithOrganisationRow
+    if err := r.db.SelectContext(ctx, &rowsData, query, ownerUserID); err != nil {
         return nil, err
     }
-    defer rows.Close()
 
-    var projects []ProjectWithOrganisation
-    for rows.Next() {
-        var item ProjectWithOrganisation
-        if err := rows.Scan(
-            &item.Project.ID,
-            &item.Project.UUID,
-            &item.Project.OrganisationID,
-            &item.Project.OwnerUserID,
-            &item.Project.Name,
-            &item.Project.Description,
-            &item.Project.Code,
-            &item.Project.CreatedAt,
-            &item.Project.CreatedBy,
-            &item.Project.UpdatedAt,
-            &item.Project.UpdatedBy,
-            &item.Project.DeletedAt,
-            &item.Project.DeletedBy,
-            &item.OrganisationUUID,
-        ); err != nil {
-            return nil, err
-        }
-        projects = append(projects, item)
+    projects := make([]ProjectWithOrganisation, 0, len(rowsData))
+    for _, row := range rowsData {
+        projects = append(projects, ProjectWithOrganisation{
+            Project:           row.Project,
+            OrganisationUUID: row.OrganisationUUID,
+        })
     }
 
-    return projects, rows.Err()
+    return projects, nil
 }
 
 // GetByUUIDAndOwner returns a project owned by the specified user.
@@ -101,31 +91,15 @@ func (r *ProjectRepository) GetByUUIDAndOwner(ctx context.Context, projectUUID s
         WHERE p.uuid = $1 AND p.owner_user_id = $2 AND p.deleted_at IS NULL AND o.deleted_at IS NULL
     `
 
-    row := r.db.QueryRowContext(ctx, query, projectUUID, ownerUserID)
-    var item ProjectWithOrganisation
-    if err := row.Scan(
-        &item.Project.ID,
-        &item.Project.UUID,
-        &item.Project.OrganisationID,
-        &item.Project.OwnerUserID,
-        &item.Project.Name,
-        &item.Project.Description,
-        &item.Project.Code,
-        &item.Project.CreatedAt,
-        &item.Project.CreatedBy,
-        &item.Project.UpdatedAt,
-        &item.Project.UpdatedBy,
-        &item.Project.DeletedAt,
-        &item.Project.DeletedBy,
-        &item.OrganisationUUID,
-    ); err != nil {
+    var row projectWithOrganisationRow
+    if err := r.db.GetContext(ctx, &row, query, projectUUID, ownerUserID); err != nil {
         if errors.Is(err, sql.ErrNoRows) {
             return nil, ErrProjectNotFound
         }
         return nil, err
     }
 
-    return &item, nil
+    return &ProjectWithOrganisation{Project: row.Project, OrganisationUUID: row.OrganisationUUID}, nil
 }
 
 // Update applies changes to an existing project that the owner has access to.
@@ -141,9 +115,9 @@ func (r *ProjectRepository) Update(ctx context.Context, projectID int64, name, d
                   created_at, created_by, updated_at, updated_by, deleted_at, deleted_by
     `
 
-    row := r.db.QueryRowContext(ctx, query, name, description, actorID, projectID)
+    row := r.db.QueryRowxContext(ctx, query, name, description, actorID, projectID)
     project := &models.Project{}
-    if err := scanProject(row, project); err != nil {
+    if err := row.StructScan(project); err != nil {
         return nil, err
     }
 
@@ -185,9 +159,8 @@ func (r *ProjectRepository) GetByCode(ctx context.Context, code string) (*models
         WHERE code = $1 AND deleted_at IS NULL
     `
 
-    row := r.db.QueryRowContext(ctx, query, code)
     project := &models.Project{}
-    if err := scanProject(row, project); err != nil {
+    if err := r.db.GetContext(ctx, project, query, code); err != nil {
         if errors.Is(err, sql.ErrNoRows) {
             return nil, ErrProjectNotFound
         }
@@ -206,9 +179,8 @@ func (r *ProjectRepository) GetByID(ctx context.Context, id int64) (*models.Proj
         WHERE id = $1 AND deleted_at IS NULL
     `
 
-    row := r.db.QueryRowContext(ctx, query, id)
     project := &models.Project{}
-    if err := scanProject(row, project); err != nil {
+    if err := r.db.GetContext(ctx, project, query, id); err != nil {
         if errors.Is(err, sql.ErrNoRows) {
             return nil, ErrProjectNotFound
         }
@@ -216,22 +188,4 @@ func (r *ProjectRepository) GetByID(ctx context.Context, id int64) (*models.Proj
     }
 
     return project, nil
-}
-
-func scanProject(row *sql.Row, project *models.Project) error {
-    return row.Scan(
-        &project.ID,
-        &project.UUID,
-        &project.OrganisationID,
-        &project.OwnerUserID,
-        &project.Name,
-        &project.Description,
-        &project.Code,
-        &project.CreatedAt,
-        &project.CreatedBy,
-        &project.UpdatedAt,
-        &project.UpdatedBy,
-        &project.DeletedAt,
-        &project.DeletedBy,
-    )
 }

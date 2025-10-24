@@ -2,14 +2,15 @@ package handler
 
 import (
     "encoding/json"
+    "errors"
     "net/http"
 
     "github.com/gin-gonic/gin"
 
-    "github.com/ctonew/mockapi/internal/dto"
-    "github.com/ctonew/mockapi/internal/repository"
-    "github.com/ctonew/mockapi/internal/requestcontext"
-    "github.com/ctonew/mockapi/internal/service"
+    "github.com/crudbox/crudbox/internal/dto"
+    "github.com/crudbox/crudbox/internal/repository"
+    "github.com/crudbox/crudbox/internal/requestcontext"
+    "github.com/crudbox/crudbox/internal/service"
 )
 
 // EndpointHandler manages CRUD operations for mock endpoints.
@@ -167,10 +168,12 @@ func (h *EndpointHandler) delete(c *gin.Context) {
 }
 
 func (h *EndpointHandler) handleServiceError(c *gin.Context, err error) {
-    switch err {
-    case service.ErrEndpointForbidden:
+    switch {
+    case errors.Is(err, service.ErrEndpointForbidden):
         c.JSON(http.StatusForbidden, gin.H{"error": "forbidden"})
-    case repository.ErrProjectNotFound, repository.ErrEndpointNotFound:
+    case errors.Is(err, service.ErrEndpointDuplicate):
+        c.JSON(http.StatusConflict, gin.H{"error": "endpoint already exists for this method and path"})
+    case errors.Is(err, repository.ErrProjectNotFound), errors.Is(err, repository.ErrEndpointNotFound):
         c.JSON(http.StatusNotFound, gin.H{"error": "resource not found"})
     default:
         c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})

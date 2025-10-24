@@ -3,7 +3,7 @@ package requestcontext
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/ctonew/mockapi/internal/models"
+	"github.com/crudbox/crudbox/internal/models"
 )
 
 const (

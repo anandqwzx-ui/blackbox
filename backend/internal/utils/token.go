@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/ctonew/mockapi/internal/models"
+	"github.com/crudbox/crudbox/internal/models"
 )
 
 // TokenManager generates and validates JWT tokens for authenticated requests.

@@ -64,8 +64,8 @@ export default function DashboardPage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const savedToken = localStorage.getItem('mockapi_token');
-    const savedEmail = localStorage.getItem('mockapi_email');
+    const savedToken = localStorage.getItem('crudbox_token');
+    const savedEmail = localStorage.getItem('crudbox_email');
 
     if (!savedToken) {
       router.replace('/login');
@@ -299,8 +299,8 @@ export default function DashboardPage() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('mockapi_token');
-    localStorage.removeItem('mockapi_email');
+    localStorage.removeItem('crudbox_token');
+    localStorage.removeItem('crudbox_email');
     router.replace('/login');
   };
 

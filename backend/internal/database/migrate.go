@@ -1,17 +1,18 @@
 package database
 
 import (
-    "database/sql"
     "embed"
     "fmt"
     "sort"
+
+    "github.com/jmoiron/sqlx"
 )
 
 //go:embed migrations/*.sql
 var migrationFiles embed.FS
 
 // RunMigrations executes the embedded SQL migration files in lexicographical order.
-func RunMigrations(db *sql.DB) error {
+func RunMigrations(db *sqlx.DB) error {
     if _, err := db.Exec(`
         CREATE TABLE IF NOT EXISTS schema_migrations (
             filename TEXT PRIMARY KEY,
@@ -55,7 +56,7 @@ func RunMigrations(db *sql.DB) error {
             return fmt.Errorf("failed to read migration %s: %w", entry.Name(), err)
         }
 
-        tx, err := db.Begin()
+        tx, err := db.Beginx()
         if err != nil {
             return fmt.Errorf("failed to start transaction for migration %s: %w", entry.Name(), err)
         }

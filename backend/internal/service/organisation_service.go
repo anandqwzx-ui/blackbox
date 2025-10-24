@@ -3,8 +3,8 @@ package service
 import (
 	"context"
 
-	"github.com/ctonew/mockapi/internal/models"
-	"github.com/ctonew/mockapi/internal/repository"
+	"github.com/crudbox/crudbox/internal/models"
+	"github.com/crudbox/crudbox/internal/repository"
 )
 
 // OrganisationService coordinates organisation-related operations with necessary access checks.

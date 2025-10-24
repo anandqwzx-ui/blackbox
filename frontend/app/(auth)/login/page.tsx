@@ -20,8 +20,8 @@ export default function LoginPage() {
 
     try {
       const response = await login(email.trim(), password);
-      localStorage.setItem('mockapi_token', response.token);
-      localStorage.setItem('mockapi_email', response.email);
+      localStorage.setItem('crudbox_token', response.token);
+      localStorage.setItem('crudbox_email', response.email);
       router.push('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Unable to log in');
